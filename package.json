@@ -1,0 +1,15 @@
+{
+  "name": "mysql-simple",
+  "description": "Provides connection pooling and a simplified interface on top of node-mysql and generic-pool.",
+  "version": "1.0.0",
+  "author": "John Hurliman <jhurliman@cull.tv>",
+  "contributors": [],
+  "dependencies": {
+    "mysql": ">= 0.9.1",
+    "generic-pool": ">= 1.0.6"
+  },
+  "keywords": ["mysql", "database", "pooling", "native"],
+  "directories": { "lib": "./lib" },
+  "main": "index",
+  "engines": { "node": "*" }
+}
