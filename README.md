@@ -1,4 +1,4 @@
-# node-mysql-simple #
+# mysql-simple #
 
 Provides connection pooling and a simplified interface on top of node-mysql and 
 generic-pool. The goal is to abstract away the details of MySQL connection 
@@ -8,7 +8,7 @@ handling and provide single-method interfaces to the database.
 
 Use NPM to install:
 
-    npm install node-mysql-simple
+    npm install mysql-simple
 
 ## Usage ##
 
