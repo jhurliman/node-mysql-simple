@@ -1,74 +1,53 @@
-# mysql-simple #
+# mysql-simple — retired
 
-Provides connection pooling and a simplified interface on top of node-mysql and 
-generic-pool. The goal is to abstract away the details of MySQL connection 
-handling and provide single-method interfaces to the database.
+**This library is no longer maintained. Use [MySQL2](https://sidorares.github.io/node-mysql2/docs) directly for new projects and migrate existing applications when practical.** This repository is retained as a read-only historical reference; no further releases or fixes are planned.
 
-## Installation ##
+`mysql-simple` originally wrapped `node-mysql` and `generic-pool` to provide a simpler pooled-query interface. MySQL2 now provides connection pooling, callback and Promise APIs, prepared statements, and TypeScript declarations without this additional wrapper.
 
-Use NPM to install:
+## Recommended replacement
 
-    npm install mysql-simple
+Install [mysql2](https://www.npmjs.com/package/mysql2):
 
-## Usage ##
+```sh
+npm install mysql2
+```
 
-    var database = require('mysql-simple');
-    // Port number is optional
-    database.init('username', 'password', 'mydatabase', 'localhost', 3306);
-    
-    database.query('SELECT * FROM users WHERE active=? LIMIT 10', [true],
-      function(err, results)
-    {
-      if (err) {
-        console.log('error fetching some active users: ' + err);
-        return;
-      }
-      
-      for (var i = 0; i < results.length; i++)
-        console.log('got active user ' + results[i]);
-    });
-    
-    database.querySingle('SELECT id,name FROM users WHERE id=?', [42],
-      function(err, result)
-    {
-      if (err) {
-        console.log('error fetching a single active user: ' + err);
-        return;
-      }
-      
-      if (result)
-        console.log('user exists!');
-      else
-        console.log('user does not exist');
-    });
-    
-    database.queryMany('SELECT * FROM users WHERE active=?', [true],
-      function(row) // Row callback
-    {
-      console.log('got active user ' + row);
-    },
-      function(err) // End callback
-    {
-      if (err) {
-        console.log('error fetching all active users: ' + err);
-        return;
-      }
-    });
-    
-    database.nonQuery('INSERT INTO users (name, email) VALUES (?, ?)',
-      ['newuser', 'newuser@gmail.com'], function(err, info)
-    {
-      if (err) {
-        console.log('error inserting new user: ' + err);
-        return;
-      }
-      
-      console.log('inserted new user, id = ' + info.insertId);
-    });
+For example, save this as `query.mjs`, configure `MYSQL_HOST`, `MYSQL_USER`, `MYSQL_PASSWORD`, and `MYSQL_DATABASE` in your environment, then run `node query.mjs`:
 
-## Sponsors ##
+```js
+import mysql from 'mysql2/promise';
 
-* [cull.tv](http://cull.tv/) - New music television
+const pool = mysql.createPool({
+  host: process.env.MYSQL_HOST || 'localhost',
+  user: process.env.MYSQL_USER,
+  password: process.env.MYSQL_PASSWORD,
+  database: process.env.MYSQL_DATABASE,
+  connectionLimit: 10,
+});
+
+try {
+  const [rows] = await pool.execute('SELECT ? AS answer', [42]);
+  console.log(rows[0].answer);
+} finally {
+  await pool.end();
+}
+```
+
+In a long-running application, reuse the pool and close it during shutdown rather than after each query. See the [MySQL2 quickstart](https://sidorares.github.io/node-mysql2/docs) and [Promise API guide](https://sidorares.github.io/node-mysql2/docs/documentation/promise-wrapper).
+
+## Migrating existing code
+
+MySQL2 is not a drop-in replacement for this wrapper:
+
+| mysql-simple | MySQL2 approach |
+| --- | --- |
+| `database.init(...)` | Create a pool with explicit connection options. |
+| `database.query(sql, params, callback)` | Use the callback pool API, or `const [rows] = await pool.query(sql, params)` with the Promise API. |
+| `database.querySingle(...)` | Read `rows[0]` from a query result; it is `undefined` when no row matches. |
+| `database.nonQuery(...)` | Use the write result from `query()` or `execute()`, including `insertId` and `affectedRows`. |
+| `database.queryMany(...)` | Use MySQL2's streaming query API when you need incremental row processing; check its backpressure and error handling. |
+
+Review result shapes, connection options, transactions, and numeric/date conversion against your application's tests before removing `mysql-simple`. The original source remains available here for migration reference.
 
 ## License ##
 
