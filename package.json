@@ -1,7 +1,7 @@
 {
   "name": "mysql-simple",
-  "description": "Provides connection pooling and a simplified interface on top of node-mysql and generic-pool.",
-  "version": "1.0.3",
+  "description": "Small callback and Promise helpers for pooled MySQL queries and backpressured row iteration.",
+  "version": "2.0.0",
   "author": "John Hurliman <jhurliman@cull.tv>",
   "contributors": [
     {
@@ -11,11 +11,44 @@
     }
   ],
   "dependencies": {
-    "mysql": "0.9.2",
-    "generic-pool": "1.0.6"
+    "mysql2": "^3.24.4"
   },
-  "keywords": ["mysql", "database", "pooling", "native"],
-  "directories": { "lib": "./lib" },
-  "main": "index",
-  "engines": { "node": "*" }
+  "keywords": [
+    "mysql",
+    "database",
+    "pooling",
+    "native"
+  ],
+  "directories": {
+    "lib": "./lib"
+  },
+  "main": "index.js",
+  "engines": {
+    "node": ">=22"
+  },
+  "types": "index.d.ts",
+  "license": "MIT",
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "lib/",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "test:integration": "node --test test/integration.js",
+    "test:types": "tsc --noEmit --strict --module nodenext --target es2022 type-tests/consumer.mts type-tests/consumer.cts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jhurliman/node-mysql-simple.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jhurliman/node-mysql-simple/issues"
+  },
+  "devDependencies": {
+    "@types/node": "22.20.2",
+    "typescript": "7.0.2"
+  }
 }
